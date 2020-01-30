@@ -20,7 +20,7 @@ SFC_Obj = SimpleFunctionCollections()
 img_name = 'logo_huawei.jpg'
 img_name = 'timg.jpeg'
 csv_name = img_name[0:-4]
-img = cv2.imread(img_name,0)
+img = cv2.imread("InputData/"+img_name,0)
 cv2.imshow('image',img)
 img_shape = np.shape(img)
 
@@ -79,3 +79,4 @@ SFC_Obj.Save_Matrix2CSV_with_TimeStamp(csv_name+"Pmap",convert2powermap(resized_
 SFC_Obj.Save_Matrix2CSV_with_TimeStamp(csv_name+"Pmap_keepscale",convert2powermap(final_img_uint8))
 #cv2.waitKey(0)
 #cv2.destroyAllWindows()
+input("Enter any key to exit~")

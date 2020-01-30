@@ -96,10 +96,10 @@ if __name__ == "__main__":
     SFCObj.Save_Matrix2CSV_with_TimeStamp("SaveCSVExample",OneDArray.reshape((1,len(OneDArray))))
     SFCObj.SaveXlsx("excelsavetest",Data)
 
-FileName = "InputExcel"   
-PathName = "InputData/"+FileName+".xlsx"
-df = pd.read_excel(PathName,"Sheet1")
-column_index = df.columns
+    FileName = "InputExcel"   
+    PathName = "InputData/"+FileName+".xlsx"
+    df = pd.read_excel(PathName,"Sheet1")
+    column_index = df.columns
   
     
     
