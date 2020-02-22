@@ -83,23 +83,78 @@ class SimpleFunctionCollections:
 if __name__ == "__main__":
     #Create a one 1D array
     import numpy as np
+    import pandas as pd
     from Class_Simple_Function_Collections import SimpleFunctionCollections
     SFCObj = SimpleFunctionCollections(1,1)
     
-    OneDArray = np.arange(1,100,1)
-    #OneDArray = [1,2,3,4]
-    Data = []
-    Data.append(OneDArray)
-    Data = np.array(OneDArray)
-    #ata = OneDArray    
-    #SFCObj.ReadCSV("SaveCSVExample_2019_09_28--18_13_04")
-    SFCObj.Save_Matrix2CSV_with_TimeStamp("SaveCSVExample",OneDArray.reshape((1,len(OneDArray))))
-    SFCObj.SaveXlsx("excelsavetest",Data)
+# =============================================================================
+#     OneDArray = np.arange(1,100,1)
+#     #OneDArray = [1,2,3,4]
+#     Data = []
+#     Data.append(OneDArray)
+#     Data = np.array(OneDArray)
+#     #ata = OneDArray    
+#     #SFCObj.ReadCSV("SaveCSVExample_2019_09_28--18_13_04")
+#     SFCObj.Save_Matrix2CSV_with_TimeStamp("SaveCSVExample",OneDArray.reshape((1,len(OneDArray))))
+#     SFCObj.SaveXlsx("excelsavetest",Data)
+# 
+#     FileName = "InputExcel"   
+#     PathName = "InputData/"+FileName+".xlsx"
+#     df = pd.read_excel(PathName,"Sheet1")
+#     column_index = df.columns
+# =============================================================================
+    
+    #%% Practice on 'Sat Feb 22 11:49:41 2020'
+    
+    #File directory
+    FileName = "TemperatureLog_V1"   
+    PathName = "InputData/"+FileName+".csv"
+    
+    ToFileName = "PandasWrite.csv"
+    
+    # Read with pandas
+    
+    DataReadbyPandas = pd.read_csv(PathName)
+    
+    Time = DataReadbyPandas.Time
+    CPUTemperature = DataReadbyPandas.CPUTemperature
+    RoomTemperature = DataReadbyPandas.RoomTemperature
+    
+    Time_np = np.array(Time)
+    CPUTemperature_np = np.array(CPUTemperature)
+    RoomTemperature_np = np.array(RoomTemperature)
+    
+    # First method to create a pandas dataframe
+    dfOut = pd.DataFrame({"Time":Time_np,
+                         "CPUTemperature": CPUTemperature_np,
+                         "RoomTemperature": RoomTemperature_np})
+    
+    # second method to create a pandas dataframe
+    sizeofTime_np = len(Time_np)
+    dataNumpyArray = [Time_np,CPUTemperature_np,RoomTemperature_np]
+    dataNumpyArray_np = np.array(dataNumpyArray)
+    dataNumpyArray_np_trnp = np.transpose(dataNumpyArray_np)
+    
+    indexList = ["Row_{}".format(idx) for idx in range(sizeofTime_np)]
+    columnsList = ["Key_{}".format(idx) for idx in range(3)]
+    
+    dfOut_1 = pd.DataFrame(data = dataNumpyArray_np_trnp,
+                           index = indexList,
+                           columns = columnsList)
 
-    FileName = "InputExcel"   
-    PathName = "InputData/"+FileName+".xlsx"
-    df = pd.read_excel(PathName,"Sheet1")
-    column_index = df.columns
+    DataTimeString = SFCObj.GetDateTimeStr()
+    FileNameString = "StoredData/PandsWrittenData_{}.csv".format(DataTimeString)
+    
+    import os
+    if not os.path.isfile(FileNameString):
+        dfOut_1.to_csv(FileNameString, header = True)
+    else:
+        dfOut_1.to_csv(FileNameString, mode = "a",header = False)
+        
+            
+    
+    
+    
   
     
     

@@ -110,3 +110,6 @@ InputData/
 *.jpg
 *.png
 *.jpeg
+*.txt
+*.pdf
+*.csv
