@@ -11,6 +11,7 @@ import time
 import datetime
 import csv
 import pandas as pd
+import os
 
 #%%
 class SimpleFunctionCollections:
@@ -78,10 +79,30 @@ class SimpleFunctionCollections:
          #column_index = df.columns
          data = df.get_values()
          return data
-                 
+
+
+    def csv_save_pd(self,dataNumpyArray_np_trnp):
+        # The input data, dataNumpyArray should be a 2D array, make sure its the right shape
+        indexRange,columnsRange = dataNumpyArray_np_trnp.shape
+        indexList = ["Row_{}".format(idx) for idx in range(indexRange)]
+        columnsList = ["Key_{}".format(idx) for idx in range(columnsRange)]
+        
+        dfOut_1 = pd.DataFrame(data = dataNumpyArray_np_trnp,
+                               index = indexList,
+                               columns = columnsList)
+    
+        DataTimeString = self.GetDateTimeStr()
+        FileNameString = "StoredData/PandsWrittenData_{}.csv".format(DataTimeString)
+        
+        if not os.path.isfile(FileNameString):
+            dfOut_1.to_csv(FileNameString, header = True)
+        else:
+            dfOut_1.to_csv(FileNameString, mode = "a",header = False)
+                
 #%%
 if __name__ == "__main__":
     #Create a one 1D array
+    import os
     import numpy as np
     import pandas as pd
     from Class_Simple_Function_Collections import SimpleFunctionCollections
@@ -135,21 +156,26 @@ if __name__ == "__main__":
     dataNumpyArray_np = np.array(dataNumpyArray)
     dataNumpyArray_np_trnp = np.transpose(dataNumpyArray_np)
     
-    indexList = ["Row_{}".format(idx) for idx in range(sizeofTime_np)]
-    columnsList = ["Key_{}".format(idx) for idx in range(3)]
+    SFCObj.csv_save_pd(dataNumpyArray_np_trnp)
+# =============================================================================
+#     indexRange,columnsRange = dataNumpyArray_np_trnp.shape
+#     indexList = ["Row_{}".format(idx) for idx in range(indexRange)]
+#     columnsList = ["Key_{}".format(idx) for idx in range(columnsRange)]
+#     
+#     dfOut_1 = pd.DataFrame(data = dataNumpyArray_np_trnp,
+#                            index = indexList,
+#                            columns = columnsList)
+# 
+#     DataTimeString = SFCObj.GetDateTimeStr()
+#     FileNameString = "StoredData/PandsWrittenData_{}.csv".format(DataTimeString)
+#     
+#     if not os.path.isfile(FileNameString):
+#         dfOut_1.to_csv(FileNameString, header = True)
+#     else:
+#         dfOut_1.to_csv(FileNameString, mode = "a",header = False)
+# =============================================================================
     
-    dfOut_1 = pd.DataFrame(data = dataNumpyArray_np_trnp,
-                           index = indexList,
-                           columns = columnsList)
 
-    DataTimeString = SFCObj.GetDateTimeStr()
-    FileNameString = "StoredData/PandsWrittenData_{}.csv".format(DataTimeString)
-    
-    import os
-    if not os.path.isfile(FileNameString):
-        dfOut_1.to_csv(FileNameString, header = True)
-    else:
-        dfOut_1.to_csv(FileNameString, mode = "a",header = False)
         
             
     
