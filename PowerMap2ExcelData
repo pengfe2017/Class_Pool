@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Sat Mar  7 08:16:41 2020
+
+@author: pengfei
+"""
+
+#%%
+import pandas as pd
+import matplotlib.pyplot as plt
+import matplotlib.patches as patches
+import numpy as np
+
+#%%
+def DrawRectangle(xy, width, height):
+    CurrentAX  = plt.gca()
+    RectangleShape = patches.Rectangle(xy = xy, width = width, height = height,edgecolor = "black")
+    CurrentAX.add_patch(RectangleShape)
+    CurrentAX.autoscale_view()
+
+#%% write a dataframe first for the excel input
+# Items mean how many shapes you have in this excel file
+NumberofItems = 9
+dfIndex = ["Items_{}".format(idx) for idx in range(NumberofItems)]
+# Number of attributions for the items above
+NumberofAttr = 6
+dfKeys = ["BLCornerX","BLCornerY","Width","Length","PowerLevel","PowerDensity"]
+
+# Create data
+
+Items = [[3,37,8,51.9,5,0.1],
+         [3.3,28.3,14,35.9,5,0.2],
+         [8.6,21.6,13.6,27.3,5,0.3],
+         [3.74,11.14,27.3,20.6,5,0.4],
+         [3.32,2.07,27.9,10.34,5,0.5],
+         [14.76,22.92,25.1,38.03,5,0.6],
+         [10.53,39.2,37.5,48.04,5,0.7],
+         [28.8,7.89,37.9,37.4,5,0.8],
+         [39.3,4.15,45.6,50.83,5,0.9]]
+
+Items01 = np.array(Items)
+
+for idx in range(9):
+    Items01[idx][2] = Items[idx][2] - Items[idx][0]
+    Items01[idx][3] = Items[idx][3] - Items[idx][1]
+
+dfInput = pd.DataFrame(data = Items01, index = dfIndex, columns = dfKeys)
+
+with pd.ExcelWriter("powermap_input.xlsx") as writer:
+    dfInput.to_excel(writer, sheet_name = "Sheet1")
+
+#%% Draw figure
+plt.figure()
+idx = 1
+for idx in range(9):    
+    DrawRectangle(xy = (Items01[idx][0],Items01[idx][1]), width = Items01[idx][2] , height = Items01[idx][3])
+    
+#%%
+BLCornerX = dfInput["BLCornerX"]
+BLCornerY = dfInput["BLCornerY"]
+TRCornerX = BLCornerX + dfInput["Width"]
+TRCornerY = BLCornerY + dfInput["Length"]
+PowerDensity = dfInput["PowerDensity"]
+
+ChipWidth = TRCornerX.max() - BLCornerX.min()
+ChipHeight = TRCornerY.max() - BLCornerY.min()
+
+UnitCellSize = 2
+
+ChipCellNumX = int(round(ChipWidth/2))
+ChipCellNumY = int(round(ChipHeight/2))
+
+idz = 0
+ItemStartCellX = int(round( (BLCornerX.iat[idz]-BLCornerX.min())/UnitCellSize ))
+ItemStartCellY = int(round( (BLCornerY.iat[idz]-BLCornerY.min())/UnitCellSize ))
+
+ItemCellNumX = int(round(dfInput["Width"].iat[idz]/UnitCellSize))
+ItemCellNumY = int(round(dfInput["Length"].iat[idz]/UnitCellSize))
+
+ItemPowerDensity = PowerDensity.iat[idz] 
+
+
+#%%
+NumberofRows = ChipCellNumY
+NumberofColumns = ChipCellNumX
+
+dfIndex = ["Rows_{}".format(idx) for idx in range(NumberofRows)]
+dfKeys = ["Keys_{}".format(idx) for idx in range(NumberofColumns)]
+
+Data = np.zeros((NumberofRows, NumberofColumns))
+dfZeros = pd.DataFrame(data = Data, index = dfIndex, columns = dfKeys)
+
+
+idz = 0
+
+for idz in range(9):
+    
+    ItemStartCellX = int(round( (BLCornerX.iat[idz]-BLCornerX.min())/UnitCellSize ))
+    ItemStartCellY = int(round( (BLCornerY.iat[idz]-BLCornerY.min())/UnitCellSize ))
+    
+    ItemCellNumX = int(round(dfInput["Width"].iat[idz]/UnitCellSize))
+    ItemCellNumY = int(round(dfInput["Length"].iat[idz]/UnitCellSize))
+    
+    ItemPowerDensity = PowerDensity.iat[idz]
+    
+    for idy in range(ItemStartCellY, ItemStartCellY+ItemCellNumY,1):
+        for idx in range(ItemStartCellX, ItemStartCellX + ItemCellNumX,1):
+            dfZeros.iat[idy,idx] = ItemPowerDensity
+    
+
+dfZerosFlip = dfZeros.iloc[::-1]
+with pd.ExcelWriter("powermap_output.xlsx") as writer:
+    dfZerosFlip.to_excel(writer, sheet_name = "Sheet1")
+
+
