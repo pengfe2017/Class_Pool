@@ -66,10 +66,10 @@ PowerDensity = dfInput["PowerDensity"]
 ChipWidth = TRCornerX.max() - BLCornerX.min()
 ChipHeight = TRCornerY.max() - BLCornerY.min()
 
-UnitCellSize = 2
+UnitCellSize = 1
 
-ChipCellNumX = int(round(ChipWidth/2))
-ChipCellNumY = int(round(ChipHeight/2))
+ChipCellNumX = int(round(ChipWidth/UnitCellSize))
+ChipCellNumY = int(round(ChipHeight/UnitCellSize))
 
 idz = 0
 ItemStartCellX = int(round( (BLCornerX.iat[idz]-BLCornerX.min())/UnitCellSize ))
@@ -102,15 +102,23 @@ for idz in range(9):
     ItemCellNumX = int(round(dfInput["Width"].iat[idz]/UnitCellSize))
     ItemCellNumY = int(round(dfInput["Length"].iat[idz]/UnitCellSize))
     
+    ItemStopCellY = ItemStartCellY + ItemCellNumY
+    ItemStopCellX = ItemStartCellX + ItemCellNumX
+    
+    if ItemStopCellX > ChipCellNumX:
+        ItemStopCellX = ItemStopCellX - 1
+    if ItemStopCellY > ChipCellNumY:
+        ItemStopCellY = ItemStopCellY - 1
+    
     ItemPowerDensity = PowerDensity.iat[idz]
     
-    for idy in range(ItemStartCellY, ItemStartCellY+ItemCellNumY,1):
-        for idx in range(ItemStartCellX, ItemStartCellX + ItemCellNumX,1):
+    for idy in range(ItemStartCellY, ItemStopCellY,1):
+        for idx in range(ItemStartCellX, ItemStopCellX,1):
             dfZeros.iat[idy,idx] = ItemPowerDensity
     
 
 dfZerosFlip = dfZeros.iloc[::-1]
-with pd.ExcelWriter("powermap_output.xlsx") as writer:
+with pd.ExcelWriter("powermap_output2.xlsx") as writer:
     dfZerosFlip.to_excel(writer, sheet_name = "Sheet1")
 
 
